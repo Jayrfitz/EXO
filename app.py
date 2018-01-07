@@ -396,6 +396,14 @@ def checkout(data):
     
     try:
         if price != 0:
+            # stripe.Subscription.create(
+            #   customer="cus_4fdAW5ftNQow1a",
+            #   items=[
+            #     {
+            #       "plan": "basic-monthly",
+            #     },
+            #   ],
+            # )
             charge = stripe.Charge.create(
                 amount=price,
                 currency="usd",

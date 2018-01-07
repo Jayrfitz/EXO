@@ -19,88 +19,60 @@ class Policy(db.Model):
             self.desc)
             
     
-class Leader(db.Model):
+class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True) # key
     f_name = db.Column(db.String(32))
     l_name = db.Column(db.String(32))
     email = db.Column(db.String(512))
+    is_super = db.Column(db.Boolean, nullable=False, default=False)
     password = db.Column(db.String(129))
-    credit_card = db.Column(db.String(28))
-    num_members = db.Column(db.Integer)
     has_paid = db.Column(db.Boolean, nullable=False, default=False)
     
-    def __init__(self, fn, ln, e, p, cc, nm, hp):
+    def __init__(self, fn, ln, e, iss, p, hp):
         self.f_name = fn
         self.l_name = ln
         self.email = e
+        self.is_super = iss
         self.password = p
-        self.credit_card = cc
-        self.num_members = nm
         self.has_paid = hp
         
     def __repr__(self): 
-        return '<Leader Data:{} {} {} {} {} {} {} {}>'.format(
+        return '<Leader Data:{} {} {} {} {} {} {}>'.format(
             self.id,
             self.f_name,
             self.l_name,
             self.email,
+            self.is_super,
             self.password,
-            self.credit_card,
-            self.num_members,
             self.has_paid)
-        
-class Member(db.Model):
-    id = db.Column(db.Integer, primary_key=True) # key
-    f_name = db.Column(db.String(32))
-    l_name = db.Column(db.String(32))
-    email = db.Column(db.String(512))
-    password = db.Column(db.String(129))
-    leader_id = db.Column(db.Integer, db.ForeignKey('leader.id'), nullable=False)
-    
-    def __init__(self, fn, ln, e, p, lid):
-        self.f_name,
-        self.l_name,
-        self.email,
-        self.password,
-        self.leader_id = lid
- 
-    
-    def __repr__(self): 
-        return '<Member Data: {} {} {} {} {} {}>'.format(
-            self.id,
-            self.f_name,
-            self.l_name,
-            self.email,
-            self.password,
-            self.leader_id)
         
         
         
         
 class License(db.Model):
     id = db.Column(db.Integer, primary_key=True) # key
-    css = db.Column(db.Integer)
-    aep = db.Column(db.Integer)
+    devices = db.Column(db.Integer)
     start_time = db.Column(db.DateTime)
-    end_time = db.Column(db.DateTime) 
+    end_time = db.Column(db.DateTime)
+    num_members = db.Column(db.Integer)
     leader_id = db.Column(db.Integer, db.ForeignKey('leader.id'), nullable=False)
     member_id = db.Column(db.Integer, db.ForeignKey('member.id'), nullable=True)
     
-    def __init__(self, css, aep, st, et, lid, mid):
-        self.css = css
-        self.aep = aep
+    def __init__(self, d, st, et, nm, lid, mid):
+        self.devices = d
         self.start_time = st
         self.end_time = et
+        self.num_members = nm
         self.leader_id = lid
         self.member_id = mid
         
     def __repr__(self): 
         return '<Hunt Data: {} {} {} {} {} {} {}>'.format(
             self.id,
-            self.css,
-            self.aep,
+            self.devices,
             self.start_time,
             self.end_time,
+            self.num_members,
             self.leader_id,
             self.member_id)
         
