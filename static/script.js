@@ -31281,19 +31281,21 @@
 	        var _this = _possibleConstructorReturn(this, (Explore.__proto__ || Object.getPrototypeOf(Explore)).call(this, props));
 
 	        _this.state = {
-	            'policy': [],
-	            'choices': [],
-	            'sub_user': [],
-	            'name': [],
+	            'primary': [],
+	            'first_name': [],
+	            'last_name': [],
 	            'email': [],
-	            'subpolicy': [],
-	            'css': [],
-	            'aep': [],
-	            'count': 2
+	            'password': [],
+	            'policies': [],
+	            'coverage': [],
+	            'coverageId': [],
+	            'coverageDesc': [],
+	            'devices': [],
+	            'count': 1
 	        };
 
 	        _this.updateExplore = _this.updateExplore.bind(_this); //callback function to changeType Socket //populates page with hunt information retrieved from database via app.py
-	        _this.addQuestion = _this.addQuestion.bind(_this); //adds question to hunt
+	        _this.addUser = _this.addUser.bind(_this); //adds question to hunt
 	        _this.save = _this.save.bind(_this); //saves hunt and questions to database
 	        _this.changePageWithNumPolicies = _this.changePageWithNumPolicies.bind(_this); //changes page to register with number of policies
 	        return _this;
@@ -31326,10 +31328,15 @@
 	                console.log('NO POLICIES');
 	            } else {
 	                var data = JSON.parse(callback);
-	                this.state.policy = data;
-
-	                console.log(this.state.policy);
+	                var policies = data['policies'];
+	                this.state.policies = policies;
+	                for (var i = 0; i < policies.length; i++) {
+	                    this.state.coverage[i] = policies[i]['policy_color'];
+	                    this.state.coverageId[i] = policies[i]['id'];
+	                    this.state.coverageDesc[i] = policies[i]['desc'];
+	                }
 	            }
+	            this.addUser();
 	        }
 	    }, {
 	        key: 'save',
@@ -31337,11 +31344,11 @@
 	            console.log("save");
 	        }
 	    }, {
-	        key: 'addQuestion',
-	        value: function addQuestion() {
+	        key: 'addUser',
+	        value: function addUser() {
 	            // Get the quiz form element
 	            var tb = document.getElementById('sub_user');
-	            var ids = document.getElementsByClassName(this.state.count - 1);
+	            var ids = document.getElementsByClassName(this.state.count);
 	            var sn = document.getElementsByName("sn");
 	            var se = document.getElementsByName("se");
 
@@ -31358,56 +31365,74 @@
 	                    }
 	                }
 	            }
-	            console.log(tb, "sub_user");
-	            console.log(filled, "filled");
+
 	            // Good to do error checking, make sure we managed to get something
 	            if (tb && filled != false) {
 	                //creating elements
 	                var tr = document.createElement('tr');
 	                var td1 = document.createElement('td');
-	                td1.innerHTML = "Sub User ".concat((this.state.count + 1).toString());
+	                td1.innerHTML = "User ".concat((this.state.count + 1).toString());
 
 	                var td2 = document.createElement('td');
-	                sn = document.createElement('textarea');
-	                sn.name = 'sn';
-	                sn.className = this.state.count;
-	                sn.cols = "15";
+	                var primary = document.createElement('input');
+	                primary.type = 'checkbox';
+	                primary.name = 'primary';
+	                primary.className = this.state.count;
+	                primary.cols = "15";
 
 	                var td3 = document.createElement('td');
-	                se = document.createElement('textarea');
-	                se.name = 'se';
-	                se.className = this.state.count;
-	                se.cols = "15";
+	                var first_name = document.createElement('textarea');
+	                first_name.name = 'first_name';
+	                first_name.className = this.state.count;
+	                first_name.cols = "15";
 
 	                var td4 = document.createElement('td');
-	                var sp = document.createElement('textarea');
-	                sp.name = 'sp';
-	                sp.className = this.state.count;
-	                sp.cols = "15";
+	                var last_name = document.createElement('textarea');
+	                last_name.name = 'last_name';
+	                last_name.className = this.state.count;
+	                last_name.cols = "15";
 
 	                var td5 = document.createElement('td');
-	                var sc = document.createElement('textarea');
-	                sc.name = 'sc';
-	                sc.className = this.state.count;
-	                sc.cols = "13";
+	                var email = document.createElement('textarea');
+	                email.name = 'email';
+	                email.className = this.state.count;
+	                email.cols = "15";
 
 	                var td6 = document.createElement('td');
-	                var sa = document.createElement('textarea');
-	                sa.name = 'sa';
-	                sa.className = this.state.count;
-	                sa.cols = "13";
+	                var password = document.createElement('textarea');
+	                password.name = 'password';
+	                password.className = this.state.count;
+	                password.cols = "15";
 
 	                var td7 = document.createElement('td');
-	                var at = document.createElement('textarea');
-	                at.name = 'at';
-	                at.className = this.state.count;
-	                at.cols = "15";
+	                var coverage = document.createElement('select');
+	                coverage.name = 'coverage';
+	                coverage.className = this.state.count;
+	                coverage.cols = "15";
 
-	                td2.appendChild(sn);
-	                td3.appendChild(se);
-	                td4.appendChild(sp);
-	                td5.appendChild(sc);
-	                td6.appendChild(sa);
+	                for (var i = 0; i < this.state.policies.length; i++) {
+
+	                    var option = document.createElement("option");
+	                    option.value = this.state.coverageId[i];
+	                    option.text = this.state.coverage[i];
+	                    coverage.appendChild(option);
+	                }
+
+	                var td8 = document.createElement('td');
+	                var devices = document.createElement('input');
+	                devices.style.width = '40px';
+	                devices.type = 'number';
+	                devices.name = 'devices';
+	                devices.className = this.state.count;
+	                devices.cols = '3';
+
+	                td2.appendChild(primary);
+	                td3.appendChild(first_name);
+	                td4.appendChild(last_name);
+	                td5.appendChild(email);
+	                td6.appendChild(password);
+	                td7.appendChild(coverage);
+	                td8.appendChild(devices);
 
 	                tr.appendChild(td1);
 	                tr.appendChild(td2);
@@ -31415,6 +31440,8 @@
 	                tr.appendChild(td4);
 	                tr.appendChild(td5);
 	                tr.appendChild(td6);
+	                tr.appendChild(td7);
+	                tr.appendChild(td8);
 
 	                tb.appendChild(tr);
 
@@ -31430,7 +31457,6 @@
 	        value: function render() {
 	            var _this3 = this;
 
-	            var n = 1;
 	            return React.createElement(
 	                'div',
 	                null,
@@ -31439,158 +31465,124 @@
 	                    { id: 'logo-small' },
 	                    React.createElement(_logoSmall.LogoSmall, null)
 	                ),
-	                React.createElement('div', { className: 'clear' }),
 	                React.createElement(
 	                    'div',
 	                    { id: 'intro' },
 	                    React.createElement(
 	                        'div',
-	                        { className: 'hunt-preview' },
+	                        { id: 'userList' },
 	                        React.createElement(
-	                            'div',
-	                            { id: 'userList' },
+	                            'table',
+	                            { id: 'admin-table2' },
 	                            React.createElement(
-	                                'table',
-	                                { id: 'admin-table2' },
+	                                'tbody',
+	                                { id: 'sub_user' },
 	                                React.createElement(
-	                                    'tbody',
+	                                    'tr',
 	                                    null,
 	                                    React.createElement(
-	                                        'tr',
+	                                        'td',
 	                                        null,
 	                                        React.createElement(
-	                                            'td',
+	                                            'b',
 	                                            null,
-	                                            React.createElement(
-	                                                'b',
-	                                                null,
-	                                                ' '
-	                                            )
-	                                        ),
-	                                        React.createElement(
-	                                            'td',
-	                                            null,
-	                                            React.createElement(
-	                                                'b',
-	                                                null,
-	                                                'Name'
-	                                            )
-	                                        ),
-	                                        React.createElement(
-	                                            'td',
-	                                            null,
-	                                            React.createElement(
-	                                                'b',
-	                                                null,
-	                                                'Email'
-	                                            )
-	                                        ),
-	                                        React.createElement(
-	                                            'td',
-	                                            null,
-	                                            React.createElement(
-	                                                'b',
-	                                                null,
-	                                                'Policy'
-	                                            )
-	                                        ),
-	                                        React.createElement(
-	                                            'td',
-	                                            null,
-	                                            React.createElement(
-	                                                'b',
-	                                                null,
-	                                                'CSS'
-	                                            )
-	                                        ),
-	                                        React.createElement(
-	                                            'td',
-	                                            null,
-	                                            React.createElement(
-	                                                'b',
-	                                                null,
-	                                                'AEP'
-	                                            )
+	                                            ' '
 	                                        )
 	                                    ),
 	                                    React.createElement(
-	                                        'tr',
+	                                        'td',
 	                                        null,
 	                                        React.createElement(
-	                                            'td',
+	                                            'b',
 	                                            null,
-	                                            'Primary User'
-	                                        ),
+	                                            'Primary'
+	                                        )
+	                                    ),
+	                                    React.createElement(
+	                                        'td',
+	                                        null,
 	                                        React.createElement(
-	                                            'td',
+	                                            'b',
 	                                            null,
-	                                            React.createElement('textarea', { name: 'pn', className: n, cols: '15' })
-	                                        ),
+	                                            'First Name'
+	                                        )
+	                                    ),
+	                                    React.createElement(
+	                                        'td',
+	                                        null,
 	                                        React.createElement(
-	                                            'td',
+	                                            'b',
 	                                            null,
-	                                            React.createElement('textarea', { name: 'pe', className: n, cols: '15' })
-	                                        ),
+	                                            'Last Name'
+	                                        )
+	                                    ),
+	                                    React.createElement(
+	                                        'td',
+	                                        null,
 	                                        React.createElement(
-	                                            'td',
+	                                            'b',
 	                                            null,
-	                                            React.createElement('textarea', { name: 'pp', className: n, cols: '15' })
-	                                        ),
+	                                            'Email'
+	                                        )
+	                                    ),
+	                                    React.createElement(
+	                                        'td',
+	                                        null,
 	                                        React.createElement(
-	                                            'td',
+	                                            'b',
 	                                            null,
-	                                            React.createElement('textarea', { name: 'pc', className: n, cols: '13' })
-	                                        ),
+	                                            'Password'
+	                                        )
+	                                    ),
+	                                    React.createElement(
+	                                        'td',
+	                                        null,
 	                                        React.createElement(
-	                                            'td',
+	                                            'b',
 	                                            null,
-	                                            React.createElement('textarea', { name: 'pa', className: n, cols: '13' })
+	                                            'Coverage'
+	                                        )
+	                                    ),
+	                                    React.createElement(
+	                                        'td',
+	                                        null,
+	                                        React.createElement(
+	                                            'b',
+	                                            null,
+	                                            'Devices'
 	                                        )
 	                                    )
 	                                )
 	                            )
-	                        ),
-	                        React.createElement(
-	                            'div',
-	                            { id: 'userList' },
-	                            React.createElement(
-	                                'table',
-	                                { id: 'admin-table2' },
-	                                React.createElement('tbody', { id: 'sub_user' })
-	                            )
-	                        ),
-	                        React.createElement(
-	                            'div',
-	                            { className: 'buttons' },
-	                            React.createElement(
-	                                'button',
-	                                { className: 'btn', onClick: this.addQuestion },
-	                                'Add Sub User'
-	                            ),
-	                            React.createElement(
-	                                'button',
-	                                { className: 'btn', onClick: this.save },
-	                                'Save Users'
-	                            )
-	                        ),
-	                        React.createElement(
-	                            'button',
-	                            { className: 'btn', onClick: function onClick() {
-	                                    return _this3.changePageWithNumPolicies('register', _this3.state.count + 1);
-	                                } },
-	                            'Register'
 	                        )
 	                    ),
 	                    React.createElement(
 	                        'div',
-	                        null,
+	                        { className: 'buttons' },
 	                        React.createElement(
 	                            'button',
-	                            { className: 'btn', onClick: function onClick() {
-	                                    return _this3.props.changePage('home');
-	                                } },
-	                            'Home'
+	                            { className: 'btn', onClick: this.addUser },
+	                            'Add User'
+	                        ),
+	                        React.createElement(
+	                            'button',
+	                            { className: 'btn', onClick: this.save },
+	                            'Save Users'
 	                        )
+	                    ),
+	                    React.createElement(
+	                        'button',
+	                        { className: 'btn', onClick: function onClick() {
+	                                return _this3.changePageWithNumPolicies('register', _this3.state.count + 1);
+	                            } },
+	                        'Register'
+	                    ),
+	                    React.createElement(
+	                        'button',
+	                        { className: 'btn', onClick: function onClick() {
+	                                return _this3.props.changePage('home');
+	                            } },
+	                        'Home'
 	                    )
 	                )
 	            );

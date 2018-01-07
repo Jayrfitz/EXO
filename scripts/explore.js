@@ -8,19 +8,21 @@ export class Explore extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            'policy':[],
-            'choices':[],
-            'sub_user':[],
-            'name':[],
+            'primary':[],
+            'first_name':[],
+            'last_name':[],
             'email':[],
-            'subpolicy':[],
-            'css':[],
-            'aep':[],
-            'count':2
+            'password':[],
+            'policies':[],
+            'coverage':[],
+            'coverageId':[],
+            'coverageDesc':[],
+            'devices':[],
+            'count':1
         };
         
         this.updateExplore = this.updateExplore.bind(this); //callback function to changeType Socket //populates page with hunt information retrieved from database via app.py
-        this.addQuestion = this.addQuestion.bind(this); //adds question to hunt
+        this.addUser = this.addUser.bind(this); //adds question to hunt
         this.save = this.save.bind(this); //saves hunt and questions to database
         this.changePageWithNumPolicies = this.changePageWithNumPolicies.bind(this);//changes page to register with number of policies
     }
@@ -44,20 +46,24 @@ export class Explore extends React.Component {
         }
         else{ 
             var data = JSON.parse(callback);
-            this.state.policy = data;
-            
-            console.log(this.state.policy);
-            
+            var policies = data['policies'];
+            this.state.policies = policies;
+            for(var i = 0; i < policies.length; i++) {
+                this.state.coverage[i] = policies[i]['policy_color'];
+                this.state.coverageId[i] = policies[i]['id'];
+                this.state.coverageDesc[i] = policies[i]['desc'];
+            }
         }
+        this.addUser();
     }
     
     save(){
         console.log("save");
     }
-    addQuestion(){
+    addUser(){
         // Get the quiz form element
         var tb = document.getElementById('sub_user');
-        var ids = document.getElementsByClassName(this.state.count - 1);
+        var ids = document.getElementsByClassName(this.state.count);
         var sn = document.getElementsByName("sn");
         var se = document.getElementsByName("se");
 
@@ -74,64 +80,89 @@ export class Explore extends React.Component {
                 }
             }
         }
-        console.log(tb ,"sub_user");
-        console.log(filled ,"filled");
+
         // Good to do error checking, make sure we managed to get something
         if (tb && filled != false)
         {
                 //creating elements
                 var tr = document.createElement('tr');
                 var td1 = document.createElement('td');
-                td1.innerHTML= "Sub User ".concat((this.state.count + 1).toString());
+                td1.innerHTML = "User ".concat((this.state.count + 1).toString());
                 
                 var td2 = document.createElement('td');
-                sn= document.createElement('textarea');
-                sn.name = 'sn';
-                sn.className = this.state.count;
-                sn.cols="15";
+                var primary = document.createElement('input');
+                primary.type = 'checkbox';
+                primary.name = 'primary';
+                primary.className = this.state.count;
+                primary.cols="15";
                 
                 var td3 = document.createElement('td');
-                se= document.createElement('textarea');
-                se.name = 'se';
-                se.className = this.state.count;
-                se.cols="15";
+                var first_name= document.createElement('textarea');
+                first_name.name = 'first_name';
+                first_name.className = this.state.count;
+                first_name.cols="15";
                 
                 var td4 = document.createElement('td');
-                var sp= document.createElement('textarea');
-                sp.name = 'sp';
-                sp.className = this.state.count;
-                sp.cols="15";
+                var last_name = document.createElement('textarea');
+                last_name.name = 'last_name';
+                last_name.className = this.state.count;
+                last_name.cols="15";
                 
                 var td5 = document.createElement('td');
-                var sc= document.createElement('textarea');
-                sc.name = 'sc';
-                sc.className = this.state.count;
-                sc.cols="13";
+                var email = document.createElement('textarea');
+                email.name = 'email';
+                email.className = this.state.count;
+                email.cols="15";
                 
                 var td6 = document.createElement('td');
-                var sa= document.createElement('textarea');
-                sa.name = 'sa';
-                sa.className = this.state.count;
-                sa.cols="13";
+                var password = document.createElement('textarea');
+                password.name = 'password';
+                password.className = this.state.count;
+                password.cols="15";
                 
                 var td7 = document.createElement('td');
-                var at= document.createElement('textarea');
-                at.name = 'at';
-                at.className = this.state.count;
-                at.cols="15";
+                var coverage = document.createElement('select');
+                coverage.name = 'coverage';
+                coverage.className = this.state.count;
+                coverage.cols="15";
                 
-                td2.appendChild(sn);
-                td3.appendChild(se);
-                td4.appendChild(sp);
-                td5.appendChild(sc);
-                td6.appendChild(sa);
-
+                
+                
+                for (var i = 0; i < this.state.policies.length; i++) {
+                    
+                    var option = document.createElement("option");
+                    option.value = this.state.coverageId[i];
+                    option.text = this.state.coverage[i];
+                    coverage.appendChild(option);
+                    
+                }
+                
+                var td8 = document.createElement('td');
+                var devices= document.createElement('input');
+                devices.style.width = '40px';
+                devices.type = 'number';
+                devices.name = 'devices';
+                devices.className = this.state.count;
+                devices.cols ='3';
+            
+                
+                td2.appendChild(primary);
+                td3.appendChild(first_name);
+                td4.appendChild(last_name);
+                td5.appendChild(email);
+                td6.appendChild(password);
+                td7.appendChild(coverage);
+                td8.appendChild(devices);
+                
                 tr.appendChild(td1);
                 tr.appendChild(td2);
                 tr.appendChild(td3);
                 tr.appendChild(td4);
                 tr.appendChild(td5);
                 tr.appendChild(td6);
+                tr.appendChild(td7);
+                tr.appendChild(td8);
+           
                
                 tb.appendChild(tr);
                 
@@ -145,52 +176,34 @@ export class Explore extends React.Component {
     }
     
     render() {
-        let n = 1;
         return (
             <div>
                 <div id = 'logo-small'>
                     <LogoSmall/>
                 </div>
-                <div className="clear"></div>
                 <div id='intro'>
-                    <div className='hunt-preview'>
-                        <div id='userList'>
-                            <table id="admin-table2">
-                                <tbody>
-                                    <tr>
-                                        <td><b> </b></td>
-                                        <td><b>Name</b></td>
-                                        <td><b>Email</b></td>
-                                        <td><b>Policy</b></td>
-                                        <td><b>CSS</b></td>
-                                        <td><b>AEP</b></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Primary User</td>
-                                        <td><textarea name='pn' className={n} cols='15'></textarea></td>
-                                        <td><textarea name='pe' className={n} cols='15'></textarea></td>
-                                        <td><textarea name='pp' className={n} cols='15'></textarea></td>
-                                        <td><textarea name='pc' className={n} cols='13'></textarea></td>
-                                        <td><textarea name='pa' className={n} cols='13'></textarea></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div id='userList'>
-                            <table id="admin-table2">
-                                <tbody id="sub_user">
-                                </tbody>
-                            </table>
-                        </div>
-                        <div className='buttons'>
-                            <button className="btn" onClick={this.addQuestion}>Add Sub User</button>   
-                            <button className="btn" onClick={this.save}>Save Users</button>  
-                        </div>
-                        <button className='btn' onClick={() => this.changePageWithNumPolicies('register',this.state.count+1)}>Register</button>
+                    <div id='userList'>
+                        <table id="admin-table2">
+                            <tbody id="sub_user">
+                                <tr>
+                                    <td><b> </b></td >
+                                    <td><b>Primary</b></td>
+                                    <td><b>First Name</b></td>
+                                    <td><b>Last Name</b></td>
+                                    <td><b>Email</b></td>
+                                    <td><b>Password</b></td>
+                                    <td><b>Coverage</b></td>
+                                    <td><b>Devices</b></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div>
-                        <button className='btn' onClick={() => this.props.changePage('home')}>Home</button>
+                    <div className='buttons'>
+                        <button className="btn" onClick={this.addUser}>Add User</button>   
+                        <button className="btn" onClick={this.save}>Save Users</button>  
                     </div>
+                    <button className='btn' onClick={() => this.changePageWithNumPolicies('register',this.state.count+1)}>Register</button>
+                    <button className='btn' onClick={() => this.props.changePage('home')}>Home</button>
                 </div>
             </div>
         );

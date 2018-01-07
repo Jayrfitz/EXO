@@ -344,6 +344,7 @@ p{
    color:white;
 }
 #userList{
+    padding-top: 40px;
     overflow: hidden;
     max-height:400px;
     max-width:100%;
