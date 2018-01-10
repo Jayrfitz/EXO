@@ -48,16 +48,20 @@ export class Register extends React.Component {
         this.handleExit = this.handleExit.bind(this);
         this.handleFormReject = this.handleFormReject.bind(this);
         this.handleCallback = this.handleCallback.bind(this);
+        this.componentDidMount = this.componentDidMount.bind(this);
     }
     
     componentDidMount() {
+        console.log('here');
         // Add an instance of the card Element into the `card-element` <div>
         this.card.mount('#card-element');
-        // var ongoingHunts = [];
+        var users = [];
         Socket.on('updateRegister', (data) => {
+            console.log(data);
+            console.log('here');
             // for(var key in data) { //convert object to array, prep for mapping
-            //     var hunt = [data[key].id,data[key].name,data[key].h_type];
-            //     ongoingHunts.push(hunt);
+            //     var hunt = [data[key].id, data[key].name, data[key].h_type];
+            //     users.push(hunt);
             // }
             this.hunts = data;
             this.forceUpdate(); //DONT ASK ME WHY THIS WORKS BUT IT WORKS, DO NOT DELETE

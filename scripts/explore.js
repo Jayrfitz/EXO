@@ -23,7 +23,6 @@ export class Explore extends React.Component {
         
         this.updateExplore = this.updateExplore.bind(this); //callback function to changeType Socket //populates page with hunt information retrieved from database via app.py
         this.addUser = this.addUser.bind(this); //adds question to hunt
-        this.save = this.save.bind(this); //saves hunt and questions to database
         this.changePageWithNumPolicies = this.changePageWithNumPolicies.bind(this);//changes page to register with number of policies
     }
     
@@ -33,11 +32,6 @@ export class Explore extends React.Component {
             Socket.emit('changeType',1, Socket.callback=this.updateExplore);
         });
     }
-    changePageWithNumPolicies(page, numPolicies){
-        this.props.setProps('select',numPolicies);
-        this.props.changePage(page);
-    }
-    
     //callback function to changeType Socket //populates page with hunt information retrieved from database via app.py
     updateExplore(callback){
         this.setState({'count':0});
@@ -57,32 +51,66 @@ export class Explore extends React.Component {
         this.addUser();
     }
     
-    save(){
-        console.log("save");
-    }
-    addUser(){
-        // Get the quiz form element
-        var tb = document.getElementById('sub_user');
-        var ids = document.getElementsByClassName(this.state.count);
-        var sn = document.getElementsByName("sn");
-        var se = document.getElementsByName("se");
-
-        var filled = true;
-        for(var m = 0; m < ids.length; m++){
-            for(var j = 0; j < sn.length; j++){
-                if(ids[m].value == sn[j].value){
-                    sn = sn[j].value;
-                    se = se[j].value;
-                    j = ids.length;
-                    if(sn == '' || se == ''){
-                        filled = false;
+    changePageWithNumPolicies(page){
+        
+        var Ufilled = true;
+        for(var w = 1; w <= this.state.count; w++){
+        // Get the user form element
+             var ids = document.getElementsByClassName(w);
+          
+             var primary = document.getElementsByName("primary");
+             var first_name = document.getElementsByName("first_name");
+             var last_name = document.getElementsByName("last_name");
+             var email = document.getElementsByName("email");
+             var password = document.getElementsByName("password");
+             var coverage = document.getElementsByName("coverage");
+             var devices = document.getElementsByName("devices");
+             
+             for(var m = 0; m < ids.length; m++){
+                for(var j = 0; j < email.length; j++){
+                    if(ids[m].value == email[j].value){
+                        email = email[j].value;
+                        password = password[j].value;
+                        j = ids.length;
+                        if(email == '' || password == ''){
+                            Ufilled = false;
+                        }
                     }
                 }
             }
         }
+        if(Ufilled){
+            for(var z = 0; z < email.length; z++){
+                this.state.primary[z]= primary[z].value;
+                this.state.first_name[z]= first_name[z].value;
+                this.state.last_name[z]= last_name[z].value;
+                this.state.email[z]= email[z].value;
+                this.state.password[z]= email[z].value;
+                this.state.coverage[z]= coverage[z].value;
+                this.state.devices[z]= devices[z].value;
+                
+            }
+            this.props.setProps('select', this.state.devices);
+            this.props.changePage(page);
+        }else{
+            alert("Please check that all pri requirements are filled");
+        }
+        
+        
+        
+    }
+    
+    
+    
+    addUser(){
+        // Get the quiz form element
+        var tb = document.getElementById('sub_user');
+        var ids = document.getElementsByClassName(this.state.count);
+        var email = document.getElementsByName("email");
+        var password = document.getElementsByName("password");
 
         // Good to do error checking, make sure we managed to get something
-        if (tb && filled != false)
+        if (tb != false)
         {
                 //creating elements
                 var tr = document.createElement('tr');
@@ -109,14 +137,16 @@ export class Explore extends React.Component {
                 last_name.cols="15";
                 
                 var td5 = document.createElement('td');
-                var email = document.createElement('textarea');
+                email = document.createElement('textarea');
                 email.name = 'email';
+                email.placeholder="(required)";
                 email.className = this.state.count;
                 email.cols="15";
                 
                 var td6 = document.createElement('td');
-                var password = document.createElement('textarea');
+                password = document.createElement('textarea');
                 password.name = 'password';
+                password.placeholder="(required)";
                 password.className = this.state.count;
                 password.cols="15";
                 
@@ -125,26 +155,21 @@ export class Explore extends React.Component {
                 coverage.name = 'coverage';
                 coverage.className = this.state.count;
                 coverage.cols="15";
-                
-                
-                
                 for (var i = 0; i < this.state.policies.length; i++) {
-                    
                     var option = document.createElement("option");
                     option.value = this.state.coverageId[i];
                     option.text = this.state.coverage[i];
                     coverage.appendChild(option);
-                    
                 }
                 
                 var td8 = document.createElement('td');
-                var devices= document.createElement('input');
+                var devices = document.createElement('input');
                 devices.style.width = '40px';
+                devices.setAttribute('min', '1');
                 devices.type = 'number';
                 devices.name = 'devices';
                 devices.className = this.state.count;
                 devices.cols ='3';
-            
                 
                 td2.appendChild(primary);
                 td3.appendChild(first_name);
@@ -199,10 +224,9 @@ export class Explore extends React.Component {
                         </table>
                     </div>
                     <div className='buttons'>
-                        <button className="btn" onClick={this.addUser}>Add User</button>   
-                        <button className="btn" onClick={this.save}>Save Users</button>  
+                        <button className="btn" onClick={this.addUser}>Add User</button>
                     </div>
-                    <button className='btn' onClick={() => this.changePageWithNumPolicies('register',this.state.count+1)}>Register</button>
+                    <button className='btn' onClick={() => this.changePageWithNumPolicies('register')}>Register</button>
                     <button className='btn' onClick={() => this.props.changePage('home')}>Home</button>
                 </div>
             </div>

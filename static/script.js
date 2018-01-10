@@ -31296,7 +31296,6 @@
 
 	        _this.updateExplore = _this.updateExplore.bind(_this); //callback function to changeType Socket //populates page with hunt information retrieved from database via app.py
 	        _this.addUser = _this.addUser.bind(_this); //adds question to hunt
-	        _this.save = _this.save.bind(_this); //saves hunt and questions to database
 	        _this.changePageWithNumPolicies = _this.changePageWithNumPolicies.bind(_this); //changes page to register with number of policies
 	        return _this;
 	    }
@@ -31311,13 +31310,6 @@
 	                _Socket.Socket.emit('changeType', 1, _Socket.Socket.callback = _this2.updateExplore);
 	            });
 	        }
-	    }, {
-	        key: 'changePageWithNumPolicies',
-	        value: function changePageWithNumPolicies(page, numPolicies) {
-	            this.props.setProps('select', numPolicies);
-	            this.props.changePage(page);
-	        }
-
 	        //callback function to changeType Socket //populates page with hunt information retrieved from database via app.py
 
 	    }, {
@@ -31339,9 +31331,50 @@
 	            this.addUser();
 	        }
 	    }, {
-	        key: 'save',
-	        value: function save() {
-	            console.log("save");
+	        key: 'changePageWithNumPolicies',
+	        value: function changePageWithNumPolicies(page) {
+
+	            var Ufilled = true;
+	            for (var w = 1; w <= this.state.count; w++) {
+	                // Get the user form element
+	                var ids = document.getElementsByClassName(w);
+
+	                var primary = document.getElementsByName("primary");
+	                var first_name = document.getElementsByName("first_name");
+	                var last_name = document.getElementsByName("last_name");
+	                var email = document.getElementsByName("email");
+	                var password = document.getElementsByName("password");
+	                var coverage = document.getElementsByName("coverage");
+	                var devices = document.getElementsByName("devices");
+
+	                for (var m = 0; m < ids.length; m++) {
+	                    for (var j = 0; j < email.length; j++) {
+	                        if (ids[m].value == email[j].value) {
+	                            email = email[j].value;
+	                            password = password[j].value;
+	                            j = ids.length;
+	                            if (email == '' || password == '') {
+	                                Ufilled = false;
+	                            }
+	                        }
+	                    }
+	                }
+	            }
+	            if (Ufilled) {
+	                for (var z = 0; z < email.length; z++) {
+	                    this.state.primary[z] = primary[z].value;
+	                    this.state.first_name[z] = first_name[z].value;
+	                    this.state.last_name[z] = last_name[z].value;
+	                    this.state.email[z] = email[z].value;
+	                    this.state.password[z] = email[z].value;
+	                    this.state.coverage[z] = coverage[z].value;
+	                    this.state.devices[z] = devices[z].value;
+	                }
+	                this.props.setProps('select', this.state.devices);
+	                this.props.changePage(page);
+	            } else {
+	                alert("Please check that all pri requirements are filled");
+	            }
 	        }
 	    }, {
 	        key: 'addUser',
@@ -31349,25 +31382,11 @@
 	            // Get the quiz form element
 	            var tb = document.getElementById('sub_user');
 	            var ids = document.getElementsByClassName(this.state.count);
-	            var sn = document.getElementsByName("sn");
-	            var se = document.getElementsByName("se");
-
-	            var filled = true;
-	            for (var m = 0; m < ids.length; m++) {
-	                for (var j = 0; j < sn.length; j++) {
-	                    if (ids[m].value == sn[j].value) {
-	                        sn = sn[j].value;
-	                        se = se[j].value;
-	                        j = ids.length;
-	                        if (sn == '' || se == '') {
-	                            filled = false;
-	                        }
-	                    }
-	                }
-	            }
+	            var email = document.getElementsByName("email");
+	            var password = document.getElementsByName("password");
 
 	            // Good to do error checking, make sure we managed to get something
-	            if (tb && filled != false) {
+	            if (tb != false) {
 	                //creating elements
 	                var tr = document.createElement('tr');
 	                var td1 = document.createElement('td');
@@ -31393,14 +31412,16 @@
 	                last_name.cols = "15";
 
 	                var td5 = document.createElement('td');
-	                var email = document.createElement('textarea');
+	                email = document.createElement('textarea');
 	                email.name = 'email';
+	                email.placeholder = "(required)";
 	                email.className = this.state.count;
 	                email.cols = "15";
 
 	                var td6 = document.createElement('td');
-	                var password = document.createElement('textarea');
+	                password = document.createElement('textarea');
 	                password.name = 'password';
+	                password.placeholder = "(required)";
 	                password.className = this.state.count;
 	                password.cols = "15";
 
@@ -31409,9 +31430,7 @@
 	                coverage.name = 'coverage';
 	                coverage.className = this.state.count;
 	                coverage.cols = "15";
-
 	                for (var i = 0; i < this.state.policies.length; i++) {
-
 	                    var option = document.createElement("option");
 	                    option.value = this.state.coverageId[i];
 	                    option.text = this.state.coverage[i];
@@ -31421,6 +31440,7 @@
 	                var td8 = document.createElement('td');
 	                var devices = document.createElement('input');
 	                devices.style.width = '40px';
+	                devices.setAttribute('min', '1');
 	                devices.type = 'number';
 	                devices.name = 'devices';
 	                devices.className = this.state.count;
@@ -31563,17 +31583,12 @@
 	                            'button',
 	                            { className: 'btn', onClick: this.addUser },
 	                            'Add User'
-	                        ),
-	                        React.createElement(
-	                            'button',
-	                            { className: 'btn', onClick: this.save },
-	                            'Save Users'
 	                        )
 	                    ),
 	                    React.createElement(
 	                        'button',
 	                        { className: 'btn', onClick: function onClick() {
-	                                return _this3.changePageWithNumPolicies('register', _this3.state.count + 1);
+	                                return _this3.changePageWithNumPolicies('register');
 	                            } },
 	                        'Register'
 	                    ),
@@ -51407,6 +51422,7 @@
 	        _this.handleExit = _this.handleExit.bind(_this);
 	        _this.handleFormReject = _this.handleFormReject.bind(_this);
 	        _this.handleCallback = _this.handleCallback.bind(_this);
+	        _this.componentDidMount = _this.componentDidMount.bind(_this);
 	        return _this;
 	    }
 
@@ -51415,13 +51431,16 @@
 	        value: function componentDidMount() {
 	            var _this2 = this;
 
+	            console.log('here');
 	            // Add an instance of the card Element into the `card-element` <div>
 	            this.card.mount('#card-element');
-	            // var ongoingHunts = [];
+	            var users = [];
 	            _Socket.Socket.on('updateRegister', function (data) {
+	                console.log(data);
+	                console.log('here');
 	                // for(var key in data) { //convert object to array, prep for mapping
-	                //     var hunt = [data[key].id,data[key].name,data[key].h_type];
-	                //     ongoingHunts.push(hunt);
+	                //     var hunt = [data[key].id, data[key].name, data[key].h_type];
+	                //     users.push(hunt);
 	                // }
 	                _this2.hunts = data;
 	                _this2.forceUpdate(); //DONT ASK ME WHY THIS WORKS BUT IT WORKS, DO NOT DELETE
